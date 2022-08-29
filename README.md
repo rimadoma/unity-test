@@ -1,3 +1,5 @@
+My very first Unity test project that includes simple assets and a script
+
 # To run locally
 
 ## Windows
