@@ -11,28 +11,28 @@ public class Mover : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        // TODO
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 translation = getTranslation();
-        transform.Translate(translation);
+        MovePlayer();
     }
 
-    private Vector3 getTranslation()
+    private void MovePlayer()
     {
-        Vector3 input = readInput();
+        Vector3 translation = ReadDirectionKeys();
 
         // Speed up with moveSpeed (dT is small)
-        input = input * moveSpeed;
+        translation *= moveSpeed;
 
         // Make movement speed independent of FPS
-        return input * Time.deltaTime;
-    }
+        translation *= Time.deltaTime;
 
-    private Vector3 readInput()
+        transform.Translate(translation);
+    }
+    private Vector3 ReadDirectionKeys()
     {
         return new Vector3
         {
