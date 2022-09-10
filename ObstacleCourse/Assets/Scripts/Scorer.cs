@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Scorer : MonoBehaviour
@@ -23,11 +25,19 @@ public class Scorer : MonoBehaviour
     {
         Collider collider = collision.collider;
 
-        if (!collider.CompareTag(hitTag))
+        if (!collider.CompareTag(hitTag) && !collider.CompareTag("Finish") && !collider.CompareTag("Ground"))
         {
             collider.tag = hitTag;
             bumps++;
             Debug.Log("Ow, I've hit " + bumps + " obstacles");
         }
+    }
+
+    public void logFinalScore()
+    {
+        TimeSpan time = TimeSpan.FromSeconds(Time.time);
+        string timeToComplete = time.ToString(@"hh\:mm\:ss");
+
+        Debug.Log("Obstacles hit: " + bumps + ". Course took: " + timeToComplete + " to complete");
     }
 }
