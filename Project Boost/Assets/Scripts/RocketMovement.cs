@@ -4,8 +4,9 @@ public class RocketMovement : MonoBehaviour
 {
     [SerializeField] float rotationDegreesPerSecond = 180.0f;
     [SerializeField] float thrustPerSecond = 1000.0f;
+    [SerializeField] AudioClip thrustSFX;
     private Rigidbody rigidBody;
-    private AudioSource thrustSFX;
+    private AudioSource audioSource;
     private readonly KeyCode thrustKey = KeyCode.Space;
 
     // Start is called before the first frame update
@@ -13,8 +14,8 @@ public class RocketMovement : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         Debug.Assert(rigidBody != null, "Rocket has no physics!");
-        thrustSFX = GetComponent<AudioSource>();
-        Debug.Assert(thrustSFX != null, "Rocket has thrust audio missing!");
+        audioSource = GetComponent<AudioSource>();
+        Debug.Assert(audioSource != null, "Rocket has no audio source!");
     }
 
     // Update is called once per frame
@@ -48,16 +49,16 @@ public class RocketMovement : MonoBehaviour
         if (Input.GetKeyDown(thrustKey))
         {
             // Stop the SFX so that the loop starts from the beginning
-            thrustSFX.Stop();
-            thrustSFX.mute = false;
-            thrustSFX.loop = true;
-            thrustSFX.Play();
+            audioSource.Stop();
+            audioSource.mute = false;
+            audioSource.loop = true;
+            audioSource.PlayOneShot(thrustSFX);
         }
         else if (Input.GetKeyUp(thrustKey))
         {
             // Muting the sound instead of stopping avoids "popping"
-            thrustSFX.mute = true;
-            thrustSFX.loop = false;
+            audioSource.mute = true;
+            audioSource.loop = false;
         }
     }
 
@@ -81,6 +82,6 @@ public class RocketMovement : MonoBehaviour
 
     private void OnDisable()
     {
-        thrustSFX.Stop();
+        audioSource.Stop();
     }
 }

@@ -5,10 +5,26 @@ using UnityEngine.SceneManagement;
 public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float levelLoadDelaySeconds = 3.0f;
+    [SerializeField] AudioClip explosionSFX;
+    RocketMovement rocketMovement;
+    private AudioSource audioSource;
     private int nextLevelIndex;
+    private bool gameOver;
+
+    private void Start()
+    {
+        gameOver = false;
+        rocketMovement = GetComponent<RocketMovement>();
+        audioSource = rocketMovement.GetComponent<AudioSource>();
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (gameOver)
+        {
+            return;
+        }
+
         switch(collision.collider.tag)
         {
             case "Finish":
@@ -27,7 +43,7 @@ public class CollisionHandler : MonoBehaviour
 
     private void LevelEndSequence(bool success)
     {
-        GetComponent<RocketMovement>().enabled = false;
+        rocketMovement.enabled = false;
 
         int currentIndex = SceneManager.GetActiveScene().buildIndex;
         if (success)
@@ -42,7 +58,10 @@ public class CollisionHandler : MonoBehaviour
         else
         {
             nextLevelIndex = currentIndex;
+            audioSource.PlayOneShot(explosionSFX);
         }
+
+        gameOver = true;
 
         Invoke(nameof(LoadNextLevel), levelLoadDelaySeconds);
     }

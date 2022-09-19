@@ -132,6 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationDegreesPerSecond: 120
   thrustPerSecond: 1400
+  thrustSFX: {fileID: 8300000, guid: a20edaf213a524446be8dffb1b7f99f8, type: 3}
 --- !u!82 &1639120131
 AudioSource:
   m_ObjectHideFlags: 0
@@ -142,7 +143,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: a20edaf213a524446be8dffb1b7f99f8, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -240,3 +241,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 344b7309091610543af5ef74aa2c7452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelLoadDelaySeconds: 3
