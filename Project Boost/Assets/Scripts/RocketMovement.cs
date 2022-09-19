@@ -8,11 +8,14 @@ public class RocketMovement : MonoBehaviour
     [SerializeField] float rotationDegreesPerSecond = 180.0f;
     [SerializeField] float thrustPerSecond = 1000.0f;
     private Rigidbody rigidBody;
+    private AudioSource thrustSound;
+    private KeyCode thrustKey = KeyCode.Space;
 
     // Start is called before the first frame update
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
+        thrustSound = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -25,19 +28,34 @@ public class RocketMovement : MonoBehaviour
     {
         ApplyRotation();
         ApplyThrust();
+        ApplyThrustSound();
     }
 
     private void ApplyThrust()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(thrustKey))
         {
             rigidBody.AddRelativeForce(Vector3.up * NormaliseToFPS(thrustPerSecond));
         }
     }
-
     private float NormaliseToFPS(float speedPerSecond)
     {
         return speedPerSecond * Time.deltaTime;
+    }
+
+    private void ApplyThrustSound()
+    {
+        if (thrustSound != null)
+        {
+            if (Input.GetKeyDown(thrustKey))
+            {
+                thrustSound.Play();
+            } 
+            else if (Input.GetKeyUp(thrustKey))
+            {
+                thrustSound.Stop();
+            }
+        }
     }
 
     private void ApplyRotation()

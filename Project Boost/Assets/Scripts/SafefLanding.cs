@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /**
@@ -31,7 +28,6 @@ public class SafefLanding : MonoBehaviour
     {
         if (collision.collider.CompareTag(playerTag) && playerBody != null)
         {
-            Debug.Log("Landed");
             // TO DO: disable only if player got the rocket "straight enough"
             playerBody.useGravity = false;
             playerBody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
@@ -42,7 +38,6 @@ public class SafefLanding : MonoBehaviour
     {
         if (collision.collider.CompareTag(playerTag) && playerBody != null)
         {
-            Debug.Log("Taking off");
             playerBody.useGravity = true;
             playerBody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         }
