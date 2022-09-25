@@ -242,3 +242,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelLoadDelaySeconds: 3
+  explosionSFX: {fileID: 8300000, guid: 35e3bc878c870964b8b3194c235382b2, type: 3}
+  finishSFX: {fileID: 8300000, guid: ed3d0b6a86f56ba4a817ed21b4749e79, type: 3}

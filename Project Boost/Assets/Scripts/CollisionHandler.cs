@@ -6,6 +6,7 @@ public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float levelLoadDelaySeconds = 3.0f;
     [SerializeField] AudioClip explosionSFX;
+    [SerializeField] AudioClip finishSFX;
     RocketMovement rocketMovement;
     private AudioSource audioSource;
     private int nextLevelIndex;
@@ -15,7 +16,9 @@ public class CollisionHandler : MonoBehaviour
     {
         gameOver = false;
         rocketMovement = GetComponent<RocketMovement>();
+        Debug.Assert(rocketMovement != null, "Couldn't find Player script!");
         audioSource = rocketMovement.GetComponent<AudioSource>();
+        Debug.Assert(audioSource != null, "No audio source!");
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -44,7 +47,21 @@ public class CollisionHandler : MonoBehaviour
     private void LevelEndSequence(bool success)
     {
         rocketMovement.enabled = false;
+        gameOver = true;
+        PlayLevelEndAudio(success);
+        IncrementNextLevelIndex(success);
+        Invoke(nameof(LoadNextLevel), levelLoadDelaySeconds);
+    }
 
+    private void PlayLevelEndAudio(bool success)
+    {
+        AudioClip audio = success ? finishSFX : explosionSFX;
+        audioSource.mute = false;
+        audioSource.PlayOneShot(audio);
+    }
+
+    private void IncrementNextLevelIndex(bool success)
+    {
         int currentIndex = SceneManager.GetActiveScene().buildIndex;
         if (success)
         {
@@ -58,12 +75,7 @@ public class CollisionHandler : MonoBehaviour
         else
         {
             nextLevelIndex = currentIndex;
-            audioSource.PlayOneShot(explosionSFX);
         }
-
-        gameOver = true;
-
-        Invoke(nameof(LoadNextLevel), levelLoadDelaySeconds);
     }
 
     private void LoadNextLevel()
