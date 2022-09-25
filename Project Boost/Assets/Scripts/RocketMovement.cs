@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class RocketMovement : MonoBehaviour
@@ -5,15 +8,19 @@ public class RocketMovement : MonoBehaviour
     [SerializeField] float rotationDegreesPerSecond = 180.0f;
     [SerializeField] float thrustPerSecond = 1000.0f;
     [SerializeField] AudioClip thrustSFX;
+    [SerializeField] ParticleSystem mainThrustParticles;
+    [SerializeField] ParticleSystem leftThrustParticles;
+    [SerializeField] ParticleSystem rightThrustParticles;
+
     private Rigidbody rigidBody;
     private AudioSource audioSource;
-    private readonly KeyCode thrustKey = KeyCode.Space;
 
     // Start is called before the first frame update
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
         Debug.Assert(rigidBody != null, "Rocket has no physics!");
+
         audioSource = GetComponent<AudioSource>();
         Debug.Assert(audioSource != null, "Rocket has no audio source!");
     }
@@ -21,22 +28,61 @@ public class RocketMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ReadInput();
+        bool thrusting = ApplyThrust() | ApplySideThrust();
+
+        if (thrusting)
+        {
+            PlayThrustAudio();
+        }
+        else
+        {
+            audioSource.Stop();
+        }
     }
 
-    private void ReadInput()
+    private bool ApplySideThrust()
     {
-        ApplyRotation();
-        ApplyThrust();
-        ApplyThrustSound();
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            Rotate(-rotationDegreesPerSecond);
+            PlayThrustParticles(rightThrustParticles);
+            return true;
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            Rotate(rotationDegreesPerSecond);
+            PlayThrustParticles(leftThrustParticles);
+            return true;
+        }
+        else
+        {
+            leftThrustParticles.Stop();
+            rightThrustParticles.Stop();
+            return false;
+        }
     }
 
-    private void ApplyThrust()
+    private bool ApplyThrust()
     {
-        if (Input.GetKey(thrustKey))
+        if (Input.GetKey(KeyCode.Space))
         {
             rigidBody.AddRelativeForce(Vector3.up * NormaliseToFPS(thrustPerSecond));
+            PlayThrustParticles(mainThrustParticles);
+            return true;
         }
+        else
+        {
+            mainThrustParticles.Stop();
+            return false;
+        }
+    }
+
+    private void Rotate(float angle)
+    {
+        // Freeze rotation so that we can override the physics system
+        rigidBody.freezeRotation = true;
+        transform.Rotate(NormaliseToFPS(angle), 0.0f, 0.0f);
+        rigidBody.freezeRotation = false;
     }
 
     private float NormaliseToFPS(float speedPerSecond)
@@ -44,44 +90,35 @@ public class RocketMovement : MonoBehaviour
         return speedPerSecond * Time.deltaTime;
     }
 
-    private void ApplyThrustSound()
+    private void PlayThrustAudio()
     {
-        if (Input.GetKeyDown(thrustKey))
+        if (!audioSource.isPlaying)
         {
-            // Stop the SFX so that the loop starts from the beginning
-            audioSource.Stop();
-            audioSource.mute = false;
-            audioSource.loop = true;
             audioSource.PlayOneShot(thrustSFX);
-        }
-        else if (Input.GetKeyUp(thrustKey))
-        {
-            // Muting the sound instead of stopping avoids "popping"
-            audioSource.mute = true;
-            audioSource.loop = false;
         }
     }
 
-    private void ApplyRotation()
+    private void PlayThrustParticles(ParticleSystem system)
     {
-        var xAngle = 0.0f;
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (!system.isPlaying)
         {
-            xAngle -= rotationDegreesPerSecond;
+            system.Play();
         }
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            xAngle += rotationDegreesPerSecond;
-        }
+    }
 
-        // Freeze rotation so that we can override the physics system
-        rigidBody.freezeRotation = true;
-        transform.Rotate(NormaliseToFPS(xAngle), 0.0f, 0.0f);
-        rigidBody.freezeRotation = false;
+    private void StopAllParticleSystems()
+    {
+        ParticleSystem[] particleSystems = GetComponentsInChildren<ParticleSystem>();
+        foreach (var system in particleSystems)
+        {
+            system.Stop();
+        };
     }
 
     private void OnDisable()
     {
         audioSource.Stop();
+
+        StopAllParticleSystems();
     }
 }

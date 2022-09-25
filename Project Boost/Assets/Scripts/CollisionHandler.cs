@@ -6,7 +6,9 @@ public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float levelLoadDelaySeconds = 3.0f;
     [SerializeField] AudioClip explosionSFX;
+    [SerializeField] ParticleSystem explosionParticles;
     [SerializeField] AudioClip finishSFX;
+    [SerializeField] ParticleSystem finishParticles;
     RocketMovement rocketMovement;
     private AudioSource audioSource;
     private int nextLevelIndex;
@@ -48,14 +50,28 @@ public class CollisionHandler : MonoBehaviour
     {
         rocketMovement.enabled = false;
         gameOver = true;
-        PlayLevelEndAudio(success);
+        PlayLevelEndFX(success);
         IncrementNextLevelIndex(success);
         Invoke(nameof(LoadNextLevel), levelLoadDelaySeconds);
     }
 
-    private void PlayLevelEndAudio(bool success)
+    private void PlayLevelEndFX(bool success)
     {
-        AudioClip audio = success ? finishSFX : explosionSFX;
+        ParticleSystem particles;
+        AudioClip audio;
+        if (success)
+        {
+            particles = finishParticles;
+            audio = finishSFX;
+        }
+        else
+        {
+            particles = explosionParticles;
+            audio = explosionSFX;
+        }
+
+        particles.Play();
+
         audioSource.mute = false;
         audioSource.PlayOneShot(audio);
     }
